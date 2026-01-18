@@ -3,7 +3,20 @@ import { Category } from "../models/categoryModel.js";
 
 export const categoryController = async (req: Request, res: Response) => {
     try {
-        const category = await Category.create(req.body);
+        const { name, description } = req.body;
+        const category = await Category.create(
+           {
+             name,
+            description
+           }
+        );
+
+        if(!name || !description) {
+            return res.status(400).json({
+                message: "Fileds are required",
+                success: false
+            });
+        }
         return res.status(201).json({
             message: "Category created successfully",
             success: true,
