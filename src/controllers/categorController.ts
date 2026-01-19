@@ -46,3 +46,49 @@ export const getAllCategory = async (req: Request, res: Response) => {
         })
     }
 }
+
+
+export const updateCategory = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { name, description } = req.body;
+
+    if (!name && !description) {
+      return res.status(400).json({
+        success: false,
+        message: "At least one field (name or description) is required to update",
+      });
+    }
+
+    const updatedCategory = await Category.findByIdAndUpdate(
+      id,
+      {
+        ...(name && { name }),
+        ...(description && { description }),
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!updatedCategory) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Category updated successfully",
+      category: updatedCategory,
+    });
+  } catch (error) {
+    console.error("Failed to update category", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error, failed to update category",
+    });
+  }
+};
